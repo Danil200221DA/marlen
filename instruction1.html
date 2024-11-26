@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Инструкция - WINSOFT</title>
+  <style>
+    /* Основные стили */
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: black;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Центрируем содержимое по горизонтали */
+      align-items: center; /* Центрируем содержимое по вертикали */
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1; /* Отправляем canvas на задний план */
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px;
+      background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+      border-radius: 12px;
+      width: 90%;
+      max-width: 700px;
+      margin: 10px;
+      color: #fff;
+      z-index: 1; /* Контент будет выше чем canvas */
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      animation: fadeIn 2s ease-out; /* Плавное появление заголовка */
+    }
+
+    .instruction-text {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-top: 20px;
+      color: #fff;
+    }
+
+    .highlight {
+      color: #28a745; /* Зеленый цвет для промокода */
+      font-weight: bold;
+      animation: bounce 2s infinite ease-in-out; /* Анимация для промокода */
+    }
+
+    /* Анимация для текста промокода */
+    @keyframes bounce {
+      0%, 100% {
+        transform: scale(1); /* Исходный размер */
+      }
+      50% {
+        transform: scale(1.2); /* Увеличение текста */
+      }
+    }
+
+    /* Плавное появление заголовка */
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .button {
+      background-color: #3D4B61;
+      padding: 8px 16px; /* Уменьшены отступы */
+      border-radius: 8px;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px; /* Уменьшение шрифта */
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+      animation: bounceButton 2s infinite ease-in-out;
+      margin: 10px 0; /* Отступы между кнопками */
+      width: 100%;
+      max-width: 220px; /* Ограничение ширины кнопок */
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+      background-color: #28a745;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Анимация для кнопки */
+    @keyframes bounceButton {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Убираем подчеркивание для ссылки */
+    a.button {
+      text-decoration: none; /* Убираем подчеркивание для ссылки */
+    }
+
+    /* Контейнер для кнопок - вертикальное расположение */
+    .button-container {
+      display: flex;
+      flex-direction: column; /* Вертикальное расположение */
+      align-items: center; /* Центрирование кнопок по горизонтали */
+      gap: 10px; /* Отступы между кнопками */
+    }
+
+    /* Адаптивные стили для мобильных устройств */
+    @media (max-width: 768px) {
+      .instruction-text {
+        font-size: 16px; /* Уменьшение шрифта на планшетах */
+      }
+      .button {
+        font-size: 14px; /* Уменьшение шрифта для кнопок на мобильных устройствах */
+        padding: 8px 16px; /* Уменьшение отступов */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .instruction-text {
+        font-size: 14px; /* Уменьшение шрифта на мобильных устройствах */
+      }
+      .button {
+        font-size: 14px; /* Уменьшение шрифта кнопки */
+        padding: 8px 16px; /* Уменьшение отступов на мобильных устройствах */
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="background"></canvas>
+
+<div class="container">
+  <h1>Нұсқаулық</h1>
+  <p class="instruction-text">
+    Біздің менеджермен тексеруден өтіп, ақша табуды бастаңыз
+  </p>
+
+  <!-- Контейнер для кнопок -->
+  <div class="button-container">
+    <!-- Вторая кнопка: Пройти регистрацию -->
+    <a href="" class="button">Регистрация</a>
+
+    <!-- Первая кнопка: Перейти на главную -->
+    <button class="button" onclick="goToIndex()">Басты бет</button>
+  </div>
+</div>
+
+<script>
+  const canvas = document.getElementById('background');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+
+  class Particle {
+      constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.size = Math.random() * 3 + 1;
+          this.speedX = Math.random() * 2 - 1;
+          this.speedY = Math.random() * 2 - 1;
+      }
+
+      update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          // Возвращаем частицы обратно, если они выходят за границу
+          if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+          if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+      }
+
+      draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'white';
+          ctx.fill();
+      }
+  }
+
+  function init() {
+      for (let i = 0; i < 100; i++) {
+          particles.push(new Particle(
+              Math.random() * canvas.width,
+              Math.random() * canvas.height
+          ));
+      }
+  }
+
+  function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+      });
+      requestAnimationFrame(animate);
+  }
+
+  init();
+  animate();
+
+  window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles.length = 0;
+      init();
+  });
+
+  // Функция для перехода на страницу index.html
+  function goToIndex() {
+    window.location.href = 'index1.html'; // Перенаправление на страницу index.html
+  }
+</script>
+
+</body>
+</html>
